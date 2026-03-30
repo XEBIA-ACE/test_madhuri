@@ -1,26 +1,22 @@
-# Implementation Tasks
+# User Service Implementation Tasks
 
-- [ ] Define User data model (fields: id, email, password_hash, profile fields; TODO: clarify all fields).
-- [ ] Implement user_repository for data persistence (TODO: specify data store type).
-- [ ] Implement user_service for business logic (create, retrieve, update, delete).
-- [ ] Implement auth_service for authentication (login, logout, token management).
-- [ ] Implement user_controller with endpoints:
-  - [ ] POST /users
-  - [ ] GET /users/{id}
-  - [ ] PUT /users/{id}
-  - [ ] DELETE /users/{id}
-  - [ ] POST /auth/login
-  - [ ] POST /auth/logout
-  - [ ] GET /profile
-  - [ ] PUT /profile
-- [ ] Implement input validation for all endpoints.
-- [ ] Implement password hashing and secure storage.
-- [ ] Implement token issuance and validation (TODO: specify token type).
-- [ ] Implement error handling for invalid input, duplicate users, and authentication failures.
-- [ ] Add basic logging and metrics for key operations.
-- [ ] Add unit tests for user_service and auth_service.
-- [ ] Add integration tests for all API endpoints.
-- [ ] TODO: Clarify technology stack (language, framework, data store).
-- [ ] TODO: Specify and implement integration with external authentication provider if required.
-- [ ] TODO: Specify and implement data store type and schema.
-- [ ] TODO: Clarify and implement any additional profile fields or invariants.
+- [ ] Define User data model (fields: id, username, email, password_hash, profile fields — TODO: clarify exact fields)
+- [ ] Implement user repository/data access layer
+- [ ] Implement POST /users/register endpoint
+- [ ] Implement POST /users/login endpoint
+- [ ] Implement GET /users/{id} endpoint
+- [ ] Implement PUT /users/{id} endpoint
+- [ ] Implement POST /users/{id}/reset-password endpoint
+- [ ] Implement POST /users/{id}/change-password endpoint
+- [ ] Integrate password hashing (e.g., bcrypt)
+- [ ] Implement JWT token generation and validation (if specified)
+- [ ] Add input validation for all endpoints
+- [ ] Implement error handling and response formatting
+- [ ] Add logging and basic metrics for user operations
+- [ ] Add integration with email/SMS for password reset (TODO: clarify if required)
+- [ ] Write unit and integration tests for all endpoints
+- [ ] TODO: Clarify tech stack (language, framework, DB) with stakeholders
+- [ ] TODO: Clarify if external authentication providers are required
+- [ ] TODO: Clarify related feature IDs and any additional requirements
+
+---
