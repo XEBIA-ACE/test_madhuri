@@ -1,62 +1,73 @@
 # User Service Specification
 
 ## Purpose
-The User Service SHALL provide secure, reliable, and performant user management APIs for the platform.
+The User Service SHALL provide secure, reliable management of user accounts and authentication for the platform.
 
-### Requirement: User Registration
-#### Scenario: Successful Registration
-- **Given** a new user submits valid registration data
-- **When** the registration endpoint is called
-- **Then** the user SHALL be created and a confirmation response returned
+### Requirement: User CRUD Operations
+- The service SHALL expose endpoints to create, retrieve, update, and delete user accounts.
+- User data SHALL include at minimum: user_id, username, email, password_hash, and profile fields (if present in context).
 
-### Requirement: User Authentication
-#### Scenario: Successful Login
-- **Given** a registered user provides valid credentials
-- **When** the login endpoint is called
-- **Then** the service SHALL authenticate the user and return an authentication token
+#### Scenario: Create User
+- Given a valid user registration payload,
+- When the POST /users endpoint is called,
+- Then a new user SHALL be created and persisted, and a success response returned.
 
-### Requirement: Profile Management
-#### Scenario: Update Profile
-- **Given** an authenticated user submits valid profile updates
-- **When** the update endpoint is called
-- **Then** the service SHALL validate and persist the changes
+#### Scenario: Retrieve User
+- Given a valid user_id,
+- When the GET /users/{id} endpoint is called,
+- Then the service SHALL return the user’s data if found, or a 404 if not.
 
-### Requirement: Password Management
-#### Scenario: Password Reset
-- **Given** a user requests a password reset
-- **When** the reset endpoint is called
-- **Then** the service SHALL initiate a secure password reset flow
+#### Scenario: Update User
+- Given a valid user_id and update payload,
+- When the PUT /users/{id} endpoint is called,
+- Then the user’s data SHALL be updated accordingly.
 
-## Technologies and Runtime Stack
-- TODO: Specify language, framework, and database (e.g., Python + FastAPI + PostgreSQL)
+#### Scenario: Delete User
+- Given a valid user_id,
+- When the DELETE /users/{id} endpoint is called,
+- Then the user SHALL be removed from the data store.
 
-## Components
-- REST API controllers/handlers for user operations
-- User repository/data access layer
-- Authentication module (e.g., JWT/OAuth2)
-- Password hashing and validation logic
+### Requirement: Authentication
+- The service SHALL provide endpoints for user login (and optionally logout).
+- Passwords MUST be stored securely (hashed).
+- On successful login, the service SHALL return an authentication token or session (if applicable).
 
-## APIs
-- POST /users/register — Register a new user
-- POST /users/login — Authenticate user and return token
-- GET /users/{id} — Retrieve user profile
-- PUT /users/{id} — Update user profile
-- POST /users/{id}/reset-password — Initiate password reset
-- POST /users/{id}/change-password — Change password
+#### Scenario: User Login
+- Given valid credentials,
+- When the POST /auth/login endpoint is called,
+- Then the service SHALL authenticate the user and return a token or session.
 
-## Data Models
-- User: id, username, email, password_hash, profile fields (TODO: list fields if available)
-- AuthenticationToken: token, expiry (if applicable)
+#### Scenario: User Logout
+- Given a valid session/token,
+- When the POST /auth/logout endpoint is called,
+- Then the session/token SHALL be invalidated.
 
-## Interactions with Dependencies
-- Database: CRUD operations for user data
-- External authentication provider: TODO (if specified)
-- Email/SMS service for password reset: TODO (if specified)
+### Technologies and Runtime Stack
+- TODO: Specify language, framework, and database (not present in context).
 
-## Key Flows
-- User registration: 1) Receive data, 2) Validate, 3) Hash password, 4) Store, 5) Respond
-- Login: 1) Receive credentials, 2) Validate, 3) Generate token, 4) Respond
-- Profile update: 1) Authenticate, 2) Validate input, 3) Update DB, 4) Respond
-- Password reset: 1) Receive request, 2) Generate token, 3) Send notification, 4) Update password
+### Components
+- Controllers/Handlers for each endpoint.
+- UserRepository for data access.
+- AuthenticationService for credential validation.
+
+### APIs
+- POST /users: Create user
+- GET /users/{id}: Retrieve user
+- PUT /users/{id}: Update user
+- DELETE /users/{id}: Delete user
+- POST /auth/login: User login
+- POST /auth/logout: User logout
+
+### Data Models
+- User: user_id, username, email, password_hash, profile fields (TODO: clarify fields)
+- Authentication payloads: username/email, password
+
+### Interactions with Dependencies
+- User data store (database): CRUD operations.
+- Authentication library/service: Password hashing, token generation.
+
+### Key Flows
+- User registration flow: 1) Receive registration, 2) Validate input, 3) Hash password, 4) Store user, 5) Return response.
+- Login flow: 1) Receive credentials, 2) Retrieve user, 3) Validate password, 4) Issue token/session, 5) Return response.
 
 ---

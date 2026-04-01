@@ -1,24 +1,26 @@
 # User Service Design
 
 ## Technical Approach
-- Expose RESTful endpoints for all user operations
-- Use secure password hashing (e.g., bcrypt, Argon2)
-- Issue JWT tokens for authentication (if specified)
-- Store user data in a relational database (e.g., PostgreSQL)
-- Modularize authentication, user management, and data access
+- RESTful API exposing user management and authentication endpoints.
+- Separation of concerns: controllers handle HTTP, services handle business logic, repositories handle data access.
+- Secure password storage using hashing algorithms.
+- Stateless authentication using tokens (e.g., JWT) if applicable.
 
 ## Architecture Decisions
-- Stateless authentication using tokens (if specified)
-- Separation of concerns between API, business logic, and data access
-- Input validation and error handling at API boundary
+- User data is persisted in a dedicated user database.
+- Authentication logic is encapsulated in a service component.
+- API endpoints follow REST conventions.
 
 ## Data Flow
-- API receives request → Validates input → Invokes business logic → Persists/retrieves data → Returns response
+1. Client sends HTTP request to User Service endpoint.
+2. Controller validates and parses request.
+3. Service layer processes business logic (e.g., password hashing, validation).
+4. Repository persists or retrieves data from the database.
+5. Response is returned to the client.
 
 ## APIs and Component Changes
-- Implement controllers for each endpoint
-- Add user repository for DB access
-- Integrate authentication/token generation module
-- Add password reset and change logic
+- Implement controllers for each endpoint.
+- Implement UserRepository for data access.
+- Implement AuthenticationService for login/logout.
 
 ---
