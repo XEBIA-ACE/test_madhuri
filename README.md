@@ -9,6 +9,7 @@ These files describe service behavior and implementation tasks — they are **no
 - `openspec/changes/employee-service/specs/spec.md`
 - `openspec/changes/employee-service/design.md`
 - `openspec/changes/employee-service/tasks.md`
+- `openspec/changes/employee-service/lld.md`
 
 ## Next steps
 - Review `proposal.md`, `specs/spec.md`, `design.md`, and `tasks.md` under `openspec/changes/`.
