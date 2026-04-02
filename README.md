@@ -5,7 +5,6 @@ This repository contains **OpenSpec** (spec-driven development) markdown artifac
 These files describe service behavior and implementation tasks — they are **not** a CI/CD pipeline.
 
 ## Files
-- `openspec/changes/emp-svc/specs.md`
 - `openspec/changes/employee-service/proposal.md`
 - `openspec/changes/employee-service/specs/spec.md`
 - `openspec/changes/employee-service/design.md`

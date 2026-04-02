@@ -1,22 +1,21 @@
 # Employee Service Implementation Tasks
 
-- [ ] Define Employee data model (fields, types, invariants) — TODO: Clarify required fields.
-- [ ] Implement EmployeeRepository for CRUD operations with relational DB.
-- [ ] Implement EmployeeService with business logic and validation.
-- [ ] Implement EmployeeController with REST endpoints:
+- [ ] Define Employee data model (fields, types) — TODO: Clarify required fields.
+- [ ] Implement EmployeeController with endpoints:
   - [ ] POST /employees
   - [ ] GET /employees/{id}
   - [ ] PUT /employees/{id}
   - [ ] DELETE /employees/{id}
-  - [ ] GET /employees (optional)
-- [ ] Implement input validation for all endpoints.
-- [ ] Implement error handling for not found, validation, and server errors.
-- [ ] Integrate logging for create, update, and delete operations.
-- [ ] Configure database connection and migrations.
-- [ ] Write unit and integration tests for all endpoints.
-- [ ] Add OpenAPI/Swagger documentation for all endpoints.
-- [ ] TODO: Specify and implement authentication/authorization if required.
-- [ ] TODO: Confirm technology stack (language, framework).
-- [ ] TODO: Clarify related feature IDs and any additional requirements from stakeholders.
+- [ ] Implement validation logic for employee input.
+- [ ] Implement EmployeeRepository for data persistence.
+- [ ] Integrate with persistent data store (DB type TBD).
+- [ ] Add error handling for invalid input, not found, and internal errors.
+- [ ] Add basic logging for all API operations.
+- [ ] Add basic metrics for API usage.
+- [ ] Write unit tests for controller and repository.
+- [ ] Write integration tests for API endpoints.
+- [ ] TODO: Specify technology stack (language, framework, DB).
+- [ ] TODO: Clarify if event publishing or external integrations are required.
+- [ ] TODO: Add authentication/authorization if required by future requirements.
 
 ---
