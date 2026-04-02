@@ -5,34 +5,11 @@ This repository contains **OpenSpec** (spec-driven development) markdown artifac
 These files describe service behavior and implementation tasks — they are **not** a CI/CD pipeline.
 
 ## Files
-- `Jenkinsfile`
 - `openspec/changes/employee-service/proposal.md`
 - `openspec/changes/employee-service/specs/spec.md`
 - `openspec/changes/employee-service/design.md`
 - `openspec/changes/employee-service/tasks.md`
-- `.specify/memory/constitution.md`
-- `specs/employee-crud/spec.md`
-- `specs/employee-crud/plan.md`
-- `specs/employee-crud/tasks.md`
-- `template.yaml`
-- `infrastructure.txt`
-- `module_1.txt`
-- `module_2.txt`
-- `module_3.txt`
-- `module_4.txt`
-- `module_5.txt`
-- `module_6.txt`
-- `module_7.txt`
-- `module_8.yaml`
-- `module_9.txt`
-- `module_10.txt`
-- `module_11.txt`
-- `module_12.txt`
-- `module_13.txt`
-- `module_14.txt`
-- `module_15.txt`
-- `module_16.txt`
-- `module_17.yaml`
+- `openspec/changes/employee-service/lld.md`
 
 ## Next steps
 - Review `proposal.md`, `specs/spec.md`, `design.md`, and `tasks.md` under `openspec/changes/`.
