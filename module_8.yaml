@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template for ec2 infrastructure
+
+Parameters:
+  Environment:
+    Type: String
+    Default: development
+    Description: Deployment environment
+    AllowedValues:
+      - development
+      - staging
+      - production
+
+Resources:
+  employee-ec2-instanceInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro
+      ImageId: !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}'
+      Monitoring: true
+      BlockDeviceMappings:
+        - DeviceName: /dev/xvda
+          Ebs:
+            VolumeType: gp3
+            VolumeSize: 20
+            Encrypted: true
+            DeleteOnTermination: true
+      MetadataOptions:
+        HttpEndpoint: enabled
+        HttpTokens: required
+        HttpPutResponseHopLimit: 1
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-instance'
+
+  employee-ec2-instanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for employee-ec2-instance
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-sg'
+
+Outputs:
+  ResourceId:
+    Description: Resource ID
+    Value: !Ref employee-ec2-instance
+    Export:
+      Name: !Sub '${AWS::StackName}-employee-ec2-instance-Id'

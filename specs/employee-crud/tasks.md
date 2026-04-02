@@ -1,21 +1,20 @@
-# Employee CRUD Implementation Tasks
+# Employee Service: Employee CRUD Implementation Tasks
 
-- [ ] Define Employee data model (fields: id, name, email, department, etc. — clarify exact fields).
-- [ ] Implement data validation for required fields and email uniqueness/format.
-- [ ] Implement EmployeeRepository for data persistence (clarify database technology).
-- [ ] Implement EmployeeService with business logic for CRUD operations.
-- [ ] Implement API Controller/Handler with endpoints:
-  - [ ] POST /employees
-  - [ ] GET /employees/{id}
-  - [ ] PUT /employees/{id}
-  - [ ] DELETE /employees/{id}
-- [ ] Add error handling for not found, invalid input, and server errors.
-- [ ] Add logging for all API operations.
-- [ ] Add metrics for API usage and error rates.
-- [ ] Write unit tests for service and repository logic.
-- [ ] Write integration tests for all API endpoints.
-- [ ] Clarify and implement authentication/authorization if required.
-- [ ] Document API endpoints and data model.
-- [ ] Review and finalize technology stack and deployment requirements.
+- [ ] Define Employee data model (fields and types: **TODO**).
+- [ ] Implement EmployeeRepository for data persistence (database type: **TODO**).
+- [ ] Create EmployeeController/Handler with endpoints:
+  - [ ] POST `/employees`
+  - [ ] GET `/employees/{id}`
+  - [ ] PUT `/employees/{id}`
+  - [ ] DELETE `/employees/{id}`
+- [ ] Implement input validation and error handling for all endpoints.
+- [ ] Add basic logging for API requests and errors.
+- [ ] Add unit tests for EmployeeRepository.
+- [ ] Add unit and integration tests for EmployeeController/Handler.
+- [ ] Document API endpoints and expected request/response formats.
+- [ ] **TODO:** Specify technology stack (language, framework, database).
+- [ ] **TODO:** Clarify data model fields and invariants with domain experts.
+- [ ] **TODO:** Specify authentication/authorization requirements if needed.
+- [ ] **TODO:** Define database schema and migration scripts if applicable.
 
 ---
