@@ -1,31 +1,32 @@
 # Employee Service Design
 
 ## Technical Approach
-- Expose RESTful API endpoints for employee management.
-- Use a layered architecture: API handler, service/domain logic, and data access/repository.
-- Persist employee data in a backing data store (type: TODO).
+- Expose RESTful HTTP endpoints for employee management.
+- Use a controller/handler to route requests to business logic.
+- Persist employee data in a database via a repository pattern.
+- Validate all incoming data for required fields and types.
 
 ## Architecture Decisions
-- CRUD operations are mapped to standard HTTP verbs and resource paths.
-- Data validation is performed at the API boundary.
-- Error handling for not found, invalid input, and persistence errors.
+- CRUD endpoints are the primary interface.
+- Data store selection is left as a TODO (not specified in context).
+- Error handling follows standard HTTP conventions.
 
 ## Data Flow
-1. API receives HTTP request.
-2. Request is validated and mapped to domain model.
-3. Data access layer interacts with the persistent store.
-4. Response is constructed and returned to the client.
+1. Client sends HTTP request to Employee Service endpoint.
+2. Controller/handler validates and parses request.
+3. Repository interacts with the data store to perform the operation.
+4. Response is returned to the client.
 
 ## APIs
 - `POST /employees`
 - `GET /employees/{id}`
-- `PUT /employees/{id}`
+- `PUT /employees/{id}` or `PATCH /employees/{id}`
 - `DELETE /employees/{id}`
 
 ## File/Component Changes
-- EmployeeController/Handler (API endpoints)
-- EmployeeService (business logic)
-- EmployeeRepository (data access)
-- Employee domain model
+- EmployeeController/Handler
+- EmployeeRepository
+- Data model definitions (Employee)
+- Configuration for data store connection
 
 ---

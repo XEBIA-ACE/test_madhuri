@@ -1,7 +1,7 @@
 # Employee Service Specification
 
 ## Purpose
-The Employee Service SHALL provide a reliable API for managing employee records, supporting CRUD operations and ensuring data integrity.
+The Employee Service SHALL provide a reliable and consistent API for managing employee records, supporting CRUD operations and ensuring data integrity.
 
 ### Requirement 1: Employee CRUD Operations
 The service SHALL expose endpoints to create, retrieve, update, and delete employee records.
@@ -18,7 +18,7 @@ The service SHALL expose endpoints to create, retrieve, update, and delete emplo
 
 #### Scenario: Update Employee
 - **Given** an existing employee ID and a valid update payload,
-- **When** a PUT request is made to `/employees/{id}`,
+- **When** a PUT/PATCH request is made to `/employees/{id}`,
 - **Then** the service SHALL update the employee record and return the updated data.
 
 #### Scenario: Delete Employee
@@ -30,50 +30,28 @@ The service SHALL expose endpoints to create, retrieve, update, and delete emplo
 - TODO: Technology stack (language, framework, database) not specified in context.
 
 ### Components
-- REST API controller/handler for employee endpoints.
-- Data access/repository layer for persistence.
-- Domain model for Employee.
+- EmployeeController/Handler: Handles HTTP requests.
+- EmployeeRepository: Persists and retrieves employee data.
+- Data Store: Persistent storage for employee records.
 
 ### APIs
-- `POST /employees` — Create a new employee.
-- `GET /employees/{id}` — Retrieve employee by ID.
-- `PUT /employees/{id}` — Update employee by ID.
-- `DELETE /employees/{id}` — Delete employee by ID.
-
-#### Inputs/Outputs
-- **Input:** Employee data (fields: TODO — not specified).
-- **Output:** Employee record with unique ID, or error message.
+- `POST /employees` - Create a new employee.
+- `GET /employees/{id}` - Retrieve employee by ID.
+- `PUT /employees/{id}` or `PATCH /employees/{id}` - Update employee.
+- `DELETE /employees/{id}` - Delete employee.
 
 ### Data Models
-- **Employee**
-  - Fields: TODO (not specified in context).
-  - Invariants: Unique employee ID.
+- Employee:
+  - Fields: id (UUID), name, email, position, department, etc. (TODO: Exact fields and types not specified in context.)
 
 ### Interactions with Dependencies
-- Persistent data store (type and protocol: TODO).
-- No external service dependencies specified.
+- Data store (SQL/NoSQL): CRUD operations for employee data.
+- Protocol: Presumed HTTP for API, database protocol for persistence.
+- Error handling: 404 for not found, 400 for validation errors, 500 for server errors.
 
 ### Key Flows
-- **Employee Creation Flow**
-  1. Receive POST request with employee data.
-  2. Validate input.
-  3. Persist to data store.
-  4. Return created employee with ID.
-
-- **Employee Retrieval Flow**
-  1. Receive GET request with employee ID.
-  2. Query data store.
-  3. Return employee data or 404.
-
-- **Employee Update Flow**
-  1. Receive PUT request with employee ID and update data.
-  2. Validate input.
-  3. Update record in data store.
-  4. Return updated employee data.
-
-- **Employee Deletion Flow**
-  1. Receive DELETE request with employee ID.
-  2. Remove record from data store.
-  3. Confirm deletion.
+- Employee creation flow: API receives request → validates payload → persists to data store → returns created record.
+- Employee update flow: API receives request → validates existence and payload → updates record → returns updated data.
+- Employee deletion flow: API receives request → validates existence → deletes record → confirms deletion.
 
 ---
