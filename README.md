@@ -5,11 +5,10 @@ This repository contains **OpenSpec** (spec-driven development) markdown artifac
 These files describe service behavior and implementation tasks — they are **not** a CI/CD pipeline.
 
 ## Files
-- `openspec/changes/employee-service/proposal.md`
-- `openspec/changes/employee-service/specs/spec.md`
-- `openspec/changes/employee-service/design.md`
-- `openspec/changes/employee-service/tasks.md`
-- `openspec/changes/employee-service/lld.md`
+- `openspec/changes/authentication-service/proposal.md`
+- `openspec/changes/authentication-service/specs/spec.md`
+- `openspec/changes/authentication-service/design.md`
+- `openspec/changes/authentication-service/tasks.md`
 
 ## Next steps
 - Review `proposal.md`, `specs/spec.md`, `design.md`, and `tasks.md` under `openspec/changes/`.
