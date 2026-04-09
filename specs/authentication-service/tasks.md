@@ -1,0 +1,27 @@
+# Task Breakdown: Authentication Service
+
+- [ ] Define OpenAPI specification for authentication endpoints.
+- [ ] Implement `/auth/login` endpoint:
+  - [ ] Accept username and password.
+  - [ ] Verify credentials against hashed password in database.
+  - [ ] Generate and return JWT token on success.
+  - [ ] Log authentication attempt.
+  - [ ] Enforce rate limiting.
+- [ ] Implement `/auth/token/validate` endpoint:
+  - [ ] Accept JWT token.
+  - [ ] Validate signature and expiration.
+  - [ ] Return validation result.
+- [ ] (Optional) Implement `/auth/password-reset` endpoint:
+  - [ ] Accept password reset request.
+  - [ ] Generate and send reset token/email.
+  - [ ] Log password reset event.
+- [ ] Set up secure user data store:
+  - [ ] Define user schema (id, username, password_hash, email, timestamps).
+  - [ ] Ensure encryption at rest.
+- [ ] Integrate password hashing (bcrypt/Argon2).
+- [ ] Integrate JWT token library for signing/validation.
+- [ ] Implement audit logging for all authentication events.
+- [ ] Implement rate limiting middleware.
+- [ ] Write unit and integration tests for all endpoints.
+- [ ] Document API endpoints and flows.
+- [ ] (TODO) Specify programming language, framework, and libraries based on HLD/context.

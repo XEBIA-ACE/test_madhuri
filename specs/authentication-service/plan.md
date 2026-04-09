@@ -1,61 +1,50 @@
-# Authentication Service Implementation Plan
+# Implementation Plan: Authentication Service
 
-## Architecture
+## Architecture Overview
 
-- **API Layer**: RESTful endpoints for registration, login, logout, and token validation.
-- **Authentication Logic**: Handles credential verification, password hashing, and token issuance.
-- **Token Management**: Issues and validates JWTs or session tokens.
-- **Persistence Layer**: Stores user credentials and metadata (e.g., in a relational or NoSQL database).
-- **Integration Points**: Exposes token validation endpoint for other services.
+- **API Layer**: RESTful endpoints for login, token issuance, token validation, and (optionally) password reset.
+- **Authentication Logic**: Handles credential verification, password hashing, and token generation.
+- **Token Service**: Issues and validates JWT tokens.
+- **Data Store**: Secure storage for user credentials (hashed and salted).
+- **Audit Logging**: Logs all authentication attempts and events.
+- **Rate Limiter**: Protects endpoints from brute-force attacks.
 
 ## Components
 
-1. **API Endpoints**
-   - `POST /register`: User registration.
-   - `POST /login`: User login.
-   - `POST /logout`: User logout.
-   - `POST /token/validate`: Token validation for internal services.
-   - `GET /health`: Health check.
+1. **REST API**
+   - `/auth/login` (POST): Accepts username/password, returns JWT on success.
+   - `/auth/token/validate` (POST): Accepts JWT, returns validation result.
+   - `/auth/password-reset` (POST): Initiates password reset (if supported).
 
-2. **Data Models**
-   - `User`: id, email, password_hash, created_at, updated_at, etc.
-   - `Session` (if session-based): user_id, token, expires_at, etc.
+2. **Authentication Logic**
+   - Password hashing (e.g., bcrypt, Argon2).
+   - Credential verification.
+   - Error handling and feedback.
 
-3. **Authentication Logic**
-   - Password hashing (bcrypt/Argon2).
-   - JWT or session token generation and validation.
-   - Rate limiting and brute-force protection.
+3. **JWT Token Service**
+   - Token generation with configurable expiration.
+   - Token signing (e.g., HMAC or RSA).
+   - Token validation logic.
 
-4. **Persistence**
-   - User data storage (database selection based on project context).
-   - Session/token storage if not using stateless JWT.
+4. **Data Store**
+   - User table with fields: id, username, password_hash, email, created_at, updated_at.
+   - Encrypted at rest.
 
-5. **Security**
-   - Input validation and sanitization.
-   - Secure token storage and transmission (HTTPS).
-   - Logging and monitoring for authentication events.
+5. **Audit Logging**
+   - Log authentication attempts, successes, failures, and password resets.
 
-6. **Testing**
-   - Unit and integration tests for all endpoints and logic.
-   - Security tests (e.g., for SQL injection, brute-force attacks).
-
-## Technologies
-
-- Programming language and framework: **TODO** (select based on project context, e.g., Python/FastAPI, Node.js/Express, Java/Spring Boot)
-- Database: **TODO** (e.g., PostgreSQL, MongoDB)
-- Token standard: JWT (JSON Web Token) or session-based (to be confirmed)
-- Password hashing: bcrypt or Argon2
+6. **Rate Limiting**
+   - Per-IP and per-user rate limiting on login endpoint.
 
 ## Integration Points
 
-- User Profile Service (for user data enrichment) - **TODO: Confirm existence**
-- Authorization Service (for role/permission checks) - **TODO: Confirm existence**
+- **User Database**: For credential storage and lookup.
+- **Other Services**: For token validation (public key or shared secret distribution).
 
-## Deployment
-
-- Containerized deployment (Docker) - **TODO: Confirm if required**
-- Expose service via API gateway or load balancer
+## Technologies (to be confirmed by HLD/context)
+- Programming language, framework, and database: **TODO** (not specified in context)
+- JWT library: **TODO**
+- Password hashing library: **TODO**
+- Logging and monitoring stack: **TODO**
 
 ---
-
-**Note:** All technology and integration choices marked as TODO must be confirmed with project stakeholders or derived from the broader architecture context.
