@@ -2,64 +2,60 @@
 
 ## Architecture
 
-- **API Layer**: RESTful endpoints for login, token validation, and logout.
-- **Authentication Logic**: Handles credential verification, token issuance, and validation.
-- **Token Management**: Uses JWT for stateless authentication.
-- **User Store**: Integrates with a user database (e.g., SQL/NoSQL) for credential lookup.
-- **Security**: Implements password hashing, rate limiting, and secure token handling.
+- **API Layer**: RESTful endpoints for registration, login, logout, and token validation.
+- **Authentication Logic**: Handles credential verification, password hashing, and token issuance.
+- **Token Management**: Issues and validates JWTs or session tokens.
+- **Persistence Layer**: Stores user credentials and metadata (e.g., in a relational or NoSQL database).
+- **Integration Points**: Exposes token validation endpoint for other services.
 
 ## Components
 
-1. **Login Endpoint**
-   - POST `/auth/login`
-   - Accepts username and password.
-   - Returns JWT on success.
+1. **API Endpoints**
+   - `POST /register`: User registration.
+   - `POST /login`: User login.
+   - `POST /logout`: User logout.
+   - `POST /token/validate`: Token validation for internal services.
+   - `GET /health`: Health check.
 
-2. **Token Validation Endpoint**
-   - POST `/auth/validate`
-   - Accepts JWT.
-   - Returns user claims if valid.
+2. **Data Models**
+   - `User`: id, email, password_hash, created_at, updated_at, etc.
+   - `Session` (if session-based): user_id, token, expires_at, etc.
 
-3. **Logout Endpoint**
-   - POST `/auth/logout`
-   - Accepts token (if using token blacklist or session store).
-   - Invalidates token/session.
+3. **Authentication Logic**
+   - Password hashing (bcrypt/Argon2).
+   - JWT or session token generation and validation.
+   - Rate limiting and brute-force protection.
 
-## Data Models
+4. **Persistence**
+   - User data storage (database selection based on project context).
+   - Session/token storage if not using stateless JWT.
 
-- **User**
-  - id (UUID)
-  - username (string)
-  - password_hash (string)
-  - email (string)
-  - is_active (bool)
-  - created_at (datetime)
+5. **Security**
+   - Input validation and sanitization.
+   - Secure token storage and transmission (HTTPS).
+   - Logging and monitoring for authentication events.
 
-- **JWT Claims**
-  - sub (user id)
-  - exp (expiration)
-  - iat (issued at)
-  - roles/permissions (optional)
-
-## Integration Points
-
-- User database for credential verification.
-- Other services for authorization (via token claims).
-- Logging and monitoring for security events.
+6. **Testing**
+   - Unit and integration tests for all endpoints and logic.
+   - Security tests (e.g., for SQL injection, brute-force attacks).
 
 ## Technologies
 
-- Language/Framework: **TODO** (Python/Node.js/Java/etc. — not specified in context)
-- JWT library for token management.
-- Secure password hashing (bcrypt, Argon2, etc.).
-- Database: **TODO** (type not specified in context)
-- REST API framework: **TODO** (not specified in context)
+- Programming language and framework: **TODO** (select based on project context, e.g., Python/FastAPI, Node.js/Express, Java/Spring Boot)
+- Database: **TODO** (e.g., PostgreSQL, MongoDB)
+- Token standard: JWT (JSON Web Token) or session-based (to be confirmed)
+- Password hashing: bcrypt or Argon2
 
-## Security Considerations
+## Integration Points
 
-- All passwords hashed and salted.
-- Tokens signed with strong secret/key.
-- Rate limiting on login endpoint.
-- HTTPS enforced for all endpoints.
+- User Profile Service (for user data enrichment) - **TODO: Confirm existence**
+- Authorization Service (for role/permission checks) - **TODO: Confirm existence**
+
+## Deployment
+
+- Containerized deployment (Docker) - **TODO: Confirm if required**
+- Expose service via API gateway or load balancer
 
 ---
+
+**Note:** All technology and integration choices marked as TODO must be confirmed with project stakeholders or derived from the broader architecture context.

@@ -2,59 +2,51 @@
 
 ## Overview
 
-The Authentication Service provides secure user authentication capabilities for the platform. It is responsible for verifying user credentials, issuing authentication tokens, and managing user sessions. This service acts as the entry point for user identity and access management across the system.
+The Authentication Service (service_id: AUTH-1) is responsible for securely managing user authentication within the system. It provides endpoints for user login, logout, registration, and token management, ensuring that only authorized users can access protected resources.
 
 ## Goals
 
-- Provide secure, standards-compliant authentication for users and services.
-- Support token-based authentication (e.g., JWT).
-- Enable integration with other platform services for authorization and user context.
-- Ensure high availability and low latency for authentication operations.
+- Provide secure, standards-compliant authentication mechanisms.
+- Support user registration, login, logout, and session/token management.
+- Integrate with other services for authorization and user profile access.
+- Ensure high availability and resilience.
 
 ## User Stories
 
+### User Registration
+- As a new user, I want to register with my email and password so that I can create an account.
+
 ### User Login
-- As a user, I want to log in with my credentials so that I can access protected resources.
+- As a registered user, I want to log in with my credentials so that I can access protected resources.
 
-### Token Issuance
-- As a user, after successful authentication, I want to receive a secure token to use for subsequent requests.
+### Token Management
+- As a user, I want to receive a secure token upon successful authentication so that I can maintain my session.
+- As a user, I want to log out and invalidate my session token.
 
-### Token Validation
-- As a service, I want to validate tokens presented by users to ensure they are authentic and unexpired.
-
-### Session Management
-- As a user, I want to log out and invalidate my session so that my credentials cannot be misused.
+### Service Integration
+- As a system component, I want to validate tokens issued by the Authentication Service to authorize user actions.
 
 ## Functional Scenarios
 
-1. **Login**
-   - User submits credentials (username/password).
-   - Service validates credentials.
-   - On success, service issues a JWT or similar token.
-
-2. **Token Validation**
-   - Service receives a token.
-   - Service verifies token signature and expiration.
-   - If valid, returns user identity and claims.
-
-3. **Logout**
-   - User requests logout.
-   - Service invalidates the session/token.
+- Registration: Accepts user details, validates input, creates user record, and returns confirmation.
+- Login: Accepts credentials, verifies user, issues JWT or session token.
+- Logout: Invalidates the user's token/session.
+- Token Validation: Provides endpoint for other services to validate tokens.
 
 ## Constraints
 
 - Must comply with security best practices (e.g., password hashing, rate limiting).
-- Tokens must be signed and have configurable expiration.
-- Service must not store plaintext passwords.
-- Must support stateless authentication (no server-side session storage unless required).
+- Must not store plaintext passwords.
+- Must support stateless authentication (JWT) and/or session-based authentication.
+- Must be horizontally scalable.
 
 ## Acceptance Criteria
 
-- [ ] Users can authenticate with valid credentials and receive a token.
-- [ ] Invalid credentials are rejected with appropriate error messages.
-- [ ] Tokens are cryptographically signed and expire as configured.
-- [ ] Token validation endpoint returns correct user claims or errors.
-- [ ] Logout endpoint invalidates tokens/sessions as appropriate.
-- [ ] All sensitive data is handled securely and never logged in plaintext.
+- [ ] Users can register, login, and logout via API endpoints.
+- [ ] Tokens are securely generated, validated, and invalidated.
+- [ ] Passwords are hashed using a strong algorithm (e.g., bcrypt, Argon2).
+- [ ] Service exposes health and readiness endpoints.
+- [ ] All endpoints are covered by automated tests.
+- [ ] Service integrates with user profile and authorization services (if present).
 
 ---
