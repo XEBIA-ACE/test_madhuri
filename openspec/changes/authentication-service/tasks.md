@@ -1,14 +1,15 @@
 # Authentication Service Implementation Tasks
 
-- [ ] Implement Authentication Controller/Handler with /login, /token/validate, and /logout endpoints.
-- [ ] Develop Token Service for token generation, validation, and expiry handling.
-- [ ] Create Session Manager for session creation, validation, and revocation.
-- [ ] Integrate with user data store for credential verification (repository/client).
-- [ ] Define data models: UserCredentials, AuthToken, Session.
-- [ ] Implement error handling for invalid credentials and tokens.
-- [ ] Add logging for all authentication events.
-- [ ] Implement basic metrics for login attempts and token validations.
+- [ ] Define User, Token, and RefreshToken data models (fields: TODO clarify exact schema).
+- [ ] Implement AuthenticationController with endpoints: /login, /logout, /token/refresh.
+- [ ] Implement TokenService for token issuance and validation.
+- [ ] Implement SessionManager for session lifecycle management.
+- [ ] Implement UserRepository for credential verification (integration with user data store).
+- [ ] Integrate logging for all authentication events.
+- [ ] Add error handling for invalid credentials and tokens.
+- [ ] Implement token expiration and refresh logic.
 - [ ] Add unit and integration tests for all endpoints and flows.
-- [ ] TODO: Specify technology stack and protocols for data store and logging integration.
-- [ ] TODO: Clarify if multi-factor authentication or password reset flows are required.
-- [ ] TODO: Confirm data model fields and invariants with domain experts if not specified.
+- [ ] Document API endpoints and expected request/response formats.
+- [ ] TODO: Specify and implement technology stack (language, framework, data store).
+- [ ] TODO: Clarify related feature IDs and update proposal/spec accordingly.
+- [ ] TODO: Confirm if user registration or password reset should be included.
