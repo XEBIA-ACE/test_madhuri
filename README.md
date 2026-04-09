@@ -7,6 +7,32 @@ These files define constitution, feature spec, plan, and tasks — they are **no
 ## Files
 - `specs/authentication-service/spec.md`
 - `specs/authentication-service/plan.md`
+- `src/AuthenticationService.sln`
+- `src/AuthenticationService/appsettings.json`
+- `src/AuthenticationService/appsettings.Development.json`
+- `src/AuthenticationService/Program.cs`
+- `src/AuthenticationService/AuthenticationService.csproj`
+- `src/AuthenticationService/Controllers/HealthController.cs`
+- `src/AuthenticationService/Controllers/AuthController.cs`
+- `src/AuthenticationService/Controllers/TokenController.cs`
+- `src/AuthenticationService/Services/JwtTokenService.cs`
+- `src/AuthenticationService/Services/AuthenticationServiceImpl.cs`
+- `src/AuthenticationService/Services/JwtSettings.cs`
+- `src/AuthenticationService/Services/ISessionRepository.cs`
+- `src/AuthenticationService/Services/IPasswordHasher.cs`
+- `src/AuthenticationService/Services/InMemoryUserRepository.cs`
+- `src/AuthenticationService/Services/InMemorySessionRepository.cs`
+- `src/AuthenticationService/Services/IUserRepository.cs`
+- `src/AuthenticationService/Services/BcryptPasswordHasher.cs`
+- `src/AuthenticationService/Services/ITokenService.cs`
+- `src/AuthenticationService/Services/IAuthenticationService.cs`
+- `src/AuthenticationService/DTOs/TokenValidationRequest.cs`
+- `src/AuthenticationService/DTOs/RegisterRequest.cs`
+- `src/AuthenticationService/DTOs/AuthResponse.cs`
+- `src/AuthenticationService/DTOs/TokenValidationResponse.cs`
+- `src/AuthenticationService/DTOs/LoginRequest.cs`
+- `src/AuthenticationService/Models/User.cs`
+- `src/AuthenticationService/Models/Session.cs`
 
 ## Next steps
 - Review `spec.md`, `plan.md`, and `tasks.md` under `specs/` and `.specify/` as applicable.
