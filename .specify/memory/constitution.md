@@ -49,3 +49,8 @@ This constitution defines the foundational principles, quality standards, and te
 - Amendments require approval from the platform security lead and service owner.
 
 ---
+
+**Pushed to GitHub:**  
+Repository: https://github.com/XEBIA-ACE/test_madhuri  
+Branch: test_madhuri  
+Commit: Add Authentication Service constitution.md and related SpecKit files
