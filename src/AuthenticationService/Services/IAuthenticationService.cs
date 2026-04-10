@@ -1,29 +1,30 @@
-using AuthenticationService.DTOs;
+using AuthenticationService.Models.DTOs;
 
 namespace AuthenticationService.Services;
 
 /// <summary>
-/// Interface for authentication operations.
+/// Service interface for authentication operations.
 /// </summary>
 public interface IAuthenticationService
 {
     /// <summary>
-    /// Registers a new user.
+    /// Authenticates a user with the provided credentials.
     /// </summary>
-    Task<AuthResponse> RegisterAsync(RegisterRequest request);
-
-    /// <summary>
-    /// Authenticates a user and returns a token.
-    /// </summary>
-    Task<AuthResponse> LoginAsync(LoginRequest request);
+    /// <param name="request">The login request containing credentials.</param>
+    /// <returns>A tuple indicating success, the login response if successful, and error message if failed.</returns>
+    Task<(bool Success, LoginResponse? Response, string? ErrorMessage)> LoginAsync(LoginRequest request);
 
     /// <summary>
     /// Logs out a user by invalidating their token.
     /// </summary>
-    Task<AuthResponse> LogoutAsync(string token);
+    /// <param name="token">The token to invalidate.</param>
+    /// <returns>A logout response indicating the result.</returns>
+    Task<LogoutResponse> LogoutAsync(string token);
 
     /// <summary>
-    /// Validates a token and returns user information.
+    /// Validates a token.
     /// </summary>
-    Task<TokenValidationResponse> ValidateTokenAsync(string token);
+    /// <param name="request">The validation request containing the token.</param>
+    /// <returns>A validation response with the result.</returns>
+    Task<ValidateResponse> ValidateAsync(ValidateRequest request);
 }

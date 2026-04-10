@@ -1,30 +1,34 @@
 # Authentication Service Design
 
 ## Technical Approach
-The Authentication Service is designed as a stateless REST API that handles user authentication, token management, and session lifecycle. It interacts with a user data store for credential verification and issues signed tokens for authenticated sessions.
+- Expose RESTful API endpoints for login, token validation, and logout.
+- Use secure token generation (e.g., JWT or opaque tokens; format TBD).
+- Store user credentials in a secure data store (type TBD).
+- Store active tokens/sessions in a fast-access store (e.g., Redis or in-memory; TBD).
+- All communication over HTTPS.
 
 ## Architecture Decisions
-- Stateless token-based authentication (e.g., JWT).
-- RESTful API endpoints for login, logout, and token refresh.
-- Separation of concerns: controllers for API, services for business logic, repositories for data access.
+- Stateless authentication via tokens.
+- Separation of concerns: API layer, token management, credential validation.
+- Token/session invalidation on logout.
 
 ## Data Flow
-1. User submits credentials to /login.
-2. Credentials are verified against the user data store.
-3. On success, a signed token and refresh token are issued.
-4. Tokens are used by clients to access protected resources.
-5. /logout endpoint invalidates the session/token.
-6. /token/refresh endpoint issues new tokens upon valid refresh token.
+1. User submits credentials to `/login`.
+2. Service validates credentials against user data store.
+3. On success, service generates and returns a token.
+4. Client uses token for subsequent requests.
+5. `/validate` endpoint checks token validity.
+6. `/logout` endpoint invalidates token/session.
 
 ## APIs
-- POST /login
-- POST /logout
-- POST /token/refresh
+- `POST /login`: Authenticate and issue token.
+- `POST /validate`: Validate token.
+- `POST /logout`: Invalidate token.
 
 ## File/Component Changes
-- AuthenticationController: Implements API endpoints.
-- TokenService: Handles token creation and validation.
-- SessionManager: Manages session state.
-- UserRepository: Interfaces with user data store.
+- Implement API controllers/handlers for each endpoint.
+- Implement TokenManager for token lifecycle.
+- Implement UserCredentialValidator.
+- Integrate with user data store and token/session store.
 
 ---

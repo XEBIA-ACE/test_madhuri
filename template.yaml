@@ -1,52 +1,50 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: CloudFormation template for ec2 infrastructure
+Description: Minimal EC2 instance with security best practices
 
 Parameters:
-  Environment:
-    Type: String
-    Default: development
-    Description: Deployment environment
-    AllowedValues:
-      - development
-      - staging
-      - production
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Type: AWS::EC2::KeyPair::KeyName
 
 Resources:
-  employee-ec2-instanceInstance:
+  MinimalEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t3.micro
-      ImageId: !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}'
+      ImageId: ami-0c94855ba95c71c99 # Amazon Linux 2 AMI (us-east-1)
+      KeyName: !Ref KeyName
       Monitoring: true
       BlockDeviceMappings:
         - DeviceName: /dev/xvda
           Ebs:
+            VolumeSize: 8
             VolumeType: gp3
-            VolumeSize: 20
             Encrypted: true
-            DeleteOnTermination: true
-      MetadataOptions:
-        HttpEndpoint: enabled
-        HttpTokens: required
-        HttpPutResponseHopLimit: 1
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-instance'
+          Value: minimal-ec2-instance
+        - Key: Environment
+          Value: development
+        - Key: ManagedBy
+          Value: CloudFormation
 
-  employee-ec2-instanceSecurityGroup:
+  MinimalEC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for employee-ec2-instance
-      SecurityGroupEgress:
-        - IpProtocol: -1
+      GroupDescription: Enable SSH access via port 22
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: !Sub '${AWS::StackName}-sg'
+          Value: minimal-ec2-instance-sg
 
 Outputs:
-  ResourceId:
-    Description: Resource ID
-    Value: !Ref employee-ec2-instance
-    Export:
-      Name: !Sub '${AWS::StackName}-employee-ec2-instance-Id'
+  InstanceId:
+    Description: Instance ID of the EC2 instance
+    Value: !Ref MinimalEC2Instance
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt MinimalEC2Instance.PublicIp

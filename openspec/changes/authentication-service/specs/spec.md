@@ -1,88 +1,66 @@
 # Authentication Service Specification
 
 ## Purpose
-The Authentication Service SHALL provide secure authentication mechanisms for users, including credential verification, token issuance, and session management.
+Provide secure authentication, token management, and session handling for platform users and services.
 
 ### Requirement: User Login
-- The service SHALL expose a POST /login endpoint.
-- Given valid user credentials, the service SHALL return an authentication token.
-- Given invalid credentials, the service SHALL return an authentication error.
-
+- **Endpoint:** `POST /login`
+- **Inputs:** `{ "username": string, "password": string }`
+- **Outputs:** `{ "token": string, "expires_at": datetime }` on success; error message on failure.
 #### Scenario: Successful Login
-- Given: A user submits valid credentials to POST /login.
-- When: The credentials are verified against the user data store.
-- Then: The service returns a valid authentication token and session information.
-
+- Given valid credentials,
+- When the user submits a login request,
+- Then the service SHALL issue a valid authentication token and expiry.
 #### Scenario: Failed Login
-- Given: A user submits invalid credentials to POST /login.
-- When: The credentials do not match any user in the data store.
-- Then: The service returns an authentication error.
+- Given invalid credentials,
+- When the user submits a login request,
+- Then the service SHALL return an authentication error and SHALL NOT issue a token.
 
 ### Requirement: Token Validation
-- The service SHALL validate tokens for downstream services.
-- Tokens MUST be signed and have an expiration time.
+- **Endpoint:** `POST /validate`
+- **Inputs:** `{ "token": string }`
+- **Outputs:** `{ "valid": boolean, "expires_at": datetime }` or error message.
+#### Scenario: Valid Token
+- Given a valid, unexpired token,
+- When the token is submitted for validation,
+- Then the service SHALL confirm validity and return expiry.
+#### Scenario: Invalid/Expired Token
+- Given an invalid or expired token,
+- When the token is submitted for validation,
+- Then the service SHALL return an error indicating invalidity.
 
-### Requirement: Token Refresh
-- The service SHALL expose a POST /token/refresh endpoint.
-- Given a valid refresh token, the service SHALL issue a new authentication token.
+### Requirement: User Logout
+- **Endpoint:** `POST /logout`
+- **Inputs:** `{ "token": string }`
+- **Outputs:** Confirmation of logout.
+#### Scenario: Successful Logout
+- Given a valid token,
+- When the user requests logout,
+- Then the service SHALL invalidate the token/session.
 
-#### Scenario: Token Refresh
-- Given: A user presents a valid refresh token.
-- When: The token is verified.
-- Then: The service issues a new authentication token.
+## Technologies and Runtime Stack
+- TODO: Technology stack, frameworks, and data stores not specified in context.
 
-### Requirement: Logout
-- The service SHALL expose a POST /logout endpoint.
-- Given a valid session or token, the service SHALL invalidate it.
+## Components
+- API Controller/Handler for login, validate, logout.
+- Token Manager (issue, validate, invalidate tokens).
+- User Credential Validator (checks credentials against user data store).
+- Session Store/Token Store (for token lifecycle).
 
-#### Scenario: Logout
-- Given: A user requests logout with a valid token.
-- When: The token/session is found.
-- Then: The service invalidates the token/session.
+## Data Models
+- Token: `{ token: string, expires_at: datetime }`
+- User Credentials: `{ username: string, password: string }`
+- TODO: Specify user and token storage schema.
 
-### Technologies and Runtime Stack
-- TODO: Specify language, framework, and data store (not present in context).
+## Interactions with Dependencies
+- User data store: Validate credentials.
+- Token/session store: Store and invalidate tokens.
+- Protocol: HTTP/HTTPS for API endpoints.
+- TODO: Specify error/response formats and retry logic.
 
-### Components
-- AuthenticationController: Handles API endpoints.
-- TokenService: Issues and validates tokens.
-- SessionManager: Manages user sessions.
-- UserRepository: Accesses user credentials.
-
-### APIs
-- POST /login: Accepts {username, password}, returns {token, refresh_token}.
-- POST /logout: Accepts {token}, invalidates session.
-- POST /token/refresh: Accepts {refresh_token}, returns new {token}.
-
-### Data Models
-- User: {id, username, password_hash, ...} (fields inferred, details TODO).
-- Token: {token, expires_at, user_id, ...} (fields inferred, details TODO).
-- RefreshToken: {refresh_token, user_id, expires_at, ...} (fields inferred, details TODO).
-
-### Interactions with Dependencies
-- UserRepository: Credential verification (protocol: internal DB or service call).
-- Downstream services: Token validation (protocol: JWT or similar).
-- Logging/Audit: Log authentication events (protocol: internal logging).
-
-### Key Flows
-
-#### Login Flow
-1. User submits credentials to /login.
-2. AuthenticationController receives request.
-3. UserRepository verifies credentials.
-4. TokenService issues token and refresh token.
-5. SessionManager creates session.
-6. Response returned to user.
-
-#### Token Refresh Flow
-1. User submits refresh token to /token/refresh.
-2. TokenService validates refresh token.
-3. New token issued if valid.
-4. Response returned to user.
-
-#### Logout Flow
-1. User submits token to /logout.
-2. SessionManager invalidates session/token.
-3. Confirmation returned to user.
+## Key Flows
+- Login flow: User submits credentials → Validate → Issue token → Respond.
+- Token validation flow: Client submits token → Validate → Respond with validity.
+- Logout flow: Client submits token → Invalidate token/session → Respond.
 
 ---

@@ -1,75 +1,116 @@
-using System.Text;
+using AuthenticationService.Configuration;
+using AuthenticationService.Middleware;
 using AuthenticationService.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using AuthenticationService.Stores;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
+// Add configuration
+builder.Services.Configure<TokenSettings>(
+    builder.Configuration.GetSection(TokenSettings.SectionName));
+
+// Add stores (singleton for in-memory implementations)
+builder.Services.AddSingleton<IUserStore, InMemoryUserStore>();
+builder.Services.AddSingleton<ITokenStore, InMemoryTokenStore>();
+
+// Add services
+builder.Services.AddScoped<IUserCredentialValidator, UserCredentialValidator>();
+builder.Services.AddScoped<ITokenManager, TokenManager>();
+builder.Services.AddSingleton<IAuthenticationMetrics, AuthenticationMetrics>();
+
+// Add background services
+builder.Services.AddHostedService<TokenCleanupService>();
+
+// Add controllers with JSON options
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
+// Add API documentation
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new()
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
         Title = "Authentication Service",
         Version = "v1",
-        Description = "Authentication Service (AUTH-1) - Manages user authentication, registration, and token management."
+        Description = "Secure authentication, token management, and session handling for platform users and services."
     });
 });
 
-// Configure JWT settings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(JwtSettings.SectionName));
-
-// Register services
-builder.Services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
-builder.Services.AddSingleton<ITokenService, JwtTokenService>();
-builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
-builder.Services.AddSingleton<ISessionRepository, InMemorySessionRepository>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationServiceImpl>();
-
-// Configure JWT authentication
-var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>() 
-    ?? new JwtSettings();
-
-builder.Services.AddAuthentication(options =>
+// Configure forwarded headers for reverse proxy scenarios
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSettings.Issuer,
-        ValidateAudience = true,
-        ValidAudience = jwtSettings.Audience,
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
-
-builder.Services.AddAuthorization();
 
 // Add health checks
 builder.Services.AddHealthChecks();
 
+// Add CORS if needed
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// Configure middleware pipeline
+app.UseForwardedHeaders();
+
+// Exception handling (first in pipeline)
+app.UseExceptionHandling();
+
+// Request logging
+app.UseRequestLogging();
+
+// HTTPS enforcement
+app.UseHttpsEnforcement();
+
+// HTTPS redirection (for development)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+// CORS
+app.UseCors();
+
+// Swagger (development only)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Authentication Service v1");
+        options.RoutePrefix = "swagger";
+    });
 }
 
-app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+// Health checks
+app.MapHealthChecks("/health");
+
+// Map controllers
 app.MapControllers();
-app.MapHealthChecks("/health/live");
+
+// Metrics endpoint
+app.MapGet("/metrics", (IAuthenticationMetrics metrics) => metrics.GetSnapshot())
+    .WithName("GetMetrics")
+    .WithOpenApi();
 
 app.Run();
+
+// Make Program class accessible for integration tests
+public partial class Program { }

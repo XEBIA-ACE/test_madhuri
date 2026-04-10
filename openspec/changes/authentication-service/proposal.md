@@ -1,41 +1,41 @@
 # Authentication Service Proposal
 
 ## Purpose and Business Value
-The Authentication Service provides secure user authentication capabilities for the platform. It is responsible for verifying user credentials, issuing authentication tokens, and managing user sessions. This service is foundational for ensuring that only authorized users can access protected resources across the system.
+The Authentication Service provides secure user authentication, token issuance, and session management for the platform. It ensures that only authorized users can access protected APIs and resources, forming the foundation for platform security and compliance.
 
 ## In-Scope Behavior
-- User login and credential verification.
-- Token issuance (e.g., JWT or similar).
-- Token validation for downstream services.
-- Session management (creation, validation, termination).
-- API endpoints for login, logout, and token refresh.
+- User login with credential validation.
+- Issuance of authentication tokens.
+- Token validation for protected resource access.
+- User logout and session/token invalidation.
 
 ## Out-of-Scope Behavior
-- User registration and profile management (unless explicitly included).
-- Authorization (role/permission checks) beyond basic authentication.
-- Password reset or recovery flows.
-- Multi-factor authentication (unless specified).
+- User registration and profile management.
+- Authorization (role/permission checks beyond token validation).
+- Multi-factor authentication (unless explicitly added).
+- Password reset flows.
 
 ## Responsibilities
-- Authenticate users based on provided credentials.
-- Issue and validate authentication tokens.
-- Manage user sessions and token lifecycle.
-- Expose APIs for login, logout, and token refresh.
+- Authenticate users via provided credentials.
+- Issue, validate, and invalidate authentication tokens.
+- Manage user sessions securely.
+- Expose APIs for login, logout, and token validation.
 
 ## Impacted/Depending Systems and Data Stores
-- User data store (for credential verification).
-- Downstream services relying on authentication tokens.
-- Logging and monitoring systems for audit trails.
+- User data store (for credential validation).
+- Token/session store (for token lifecycle management).
+- All platform services relying on authentication for protected endpoints.
 
 ## Acceptance Criteria
-- API endpoints:
-  - POST /login: Accepts credentials, returns token on success.
-  - POST /logout: Invalidates session/token.
-  - POST /token/refresh: Issues new token if refresh token is valid.
-- Token issuance and validation must follow security best practices.
-- Only valid users can obtain tokens; invalid credentials are rejected.
-- Session termination immediately invalidates associated tokens.
-- All authentication events are logged for auditing.
-- Related Feature IDs: TODO (to be filled in when available).
+- Endpoints:
+  - `POST /login` authenticates users and issues tokens.
+  - `POST /validate` checks token validity.
+  - `POST /logout` invalidates tokens/sessions.
+- Only valid credentials result in token issuance.
+- Invalid or expired tokens are rejected.
+- Logout invalidates the token/session.
+- All endpoints require HTTPS.
+- Service is resilient and performant (≤500ms response under normal load).
+- Related Feature IDs: TODO (not specified in context).
 
 ---

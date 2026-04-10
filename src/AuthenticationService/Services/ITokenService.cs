@@ -1,30 +1,37 @@
-using AuthenticationService.Models;
+using AuthenticationService.Models.Entities;
 
 namespace AuthenticationService.Services;
 
 /// <summary>
-/// Interface for JWT token operations.
+/// Service interface for token operations.
 /// </summary>
 public interface ITokenService
 {
     /// <summary>
-    /// Generates a JWT token for the specified user.
+    /// Generates a new JWT token for the specified user.
     /// </summary>
-    string GenerateToken(User user);
+    /// <param name="user">The user to generate a token for.</param>
+    /// <returns>A tuple containing the token string and expiration time.</returns>
+    Task<(string Token, DateTime ExpiresAt)> GenerateTokenAsync(User user);
 
     /// <summary>
-    /// Validates a JWT token and returns the claims if valid.
+    /// Validates a token and returns the validation result.
     /// </summary>
-    TokenValidationResult ValidateToken(string token);
-}
+    /// <param name="token">The token to validate.</param>
+    /// <returns>A tuple indicating validity, user ID, username, expiration, and error message if invalid.</returns>
+    Task<(bool IsValid, Guid? UserId, string? Username, DateTime? ExpiresAt, string? ErrorMessage)> ValidateTokenAsync(string token);
 
-/// <summary>
-/// Result of token validation.
-/// </summary>
-public class TokenValidationResult
-{
-    public bool IsValid { get; set; }
-    public Guid? UserId { get; set; }
-    public string? Email { get; set; }
-    public string? ErrorMessage { get; set; }
+    /// <summary>
+    /// Invalidates a token (logout).
+    /// </summary>
+    /// <param name="token">The token to invalidate.</param>
+    /// <returns>True if the token was successfully invalidated, false otherwise.</returns>
+    Task<bool> InvalidateTokenAsync(string token);
+
+    /// <summary>
+    /// Extracts the token ID (jti claim) from a token without full validation.
+    /// </summary>
+    /// <param name="token">The token to extract from.</param>
+    /// <returns>The token ID if found, null otherwise.</returns>
+    string? ExtractTokenId(string token);
 }
