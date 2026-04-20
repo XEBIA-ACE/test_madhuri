@@ -1,56 +1,42 @@
 # Authentication Service Constitution
 
-## Purpose
-This constitution defines the foundational principles, quality standards, and technical guardrails for the Authentication Service within the platform (org_id=95bd4e80-e002-4fe5-ab71-fa85aad9fec8, project_id=6ac6b43c-29aa-4b94-abde-18897563e8e1).
-
----
-
 ## Quality Principles
 
-- **Security First:** All authentication flows must prioritize security, including secure credential handling, token management, and encrypted communication (HTTPS required).
-- **Reliability:** The service must be highly available and resilient to failures, with robust error handling and graceful degradation.
-- **Performance:** All endpoints (login, validate, logout) must respond within 500ms under normal load.
-- **Scalability:** The service must support concurrent authentication requests from multiple clients and scale horizontally as needed.
-- **Testability:** All features must be covered by automated unit and integration tests, including edge cases and failure scenarios.
-- **Auditability:** Authentication events (login, logout, failed attempts) must be logged for audit and security review.
+### Security First
+- All authentication operations MUST use industry-standard security practices
+- Passwords MUST be hashed using bcrypt with minimum 12 salt rounds
+- JWT tokens MUST be signed with RS256 algorithm using RSA key pairs
+- All communications MUST use HTTPS/TLS encryption
+- Sensitive data MUST be encrypted at rest using AES-256
 
----
+### Performance Standards
+- Authentication endpoints MUST respond within 3 seconds under normal load
+- Token validation MUST complete within 500ms
+- System MUST support minimum 1,000 concurrent users
+- Database queries MUST use connection pooling and prepared statements
 
-## User Experience Principles
-
-- **Clear Feedback:** Users and clients must receive clear, actionable error messages for authentication failures.
-- **Consistency:** API responses and error formats must be consistent across all endpoints.
-- **Minimal Friction:** Authentication should be fast and reliable, minimizing user wait times and unnecessary steps.
-
----
+### Reliability Requirements
+- Service MUST maintain 99.9% uptime
+- Stateless design MUST enable horizontal scaling
+- Circuit breaker pattern MUST be implemented for external dependencies
+- Graceful degradation MUST be supported when cache is unavailable
 
 ## Technical Guardrails
 
-- **Cloud/Runtime:** The service must be deployable in a cloud-native environment (e.g., Kubernetes, serverless, or containerized runtime). The specific stack is to be defined in the implementation plan.
-- **Data Storage:** User credentials and tokens must be stored securely, using industry best practices (e.g., hashed passwords, encrypted tokens). The choice of data store (SQL, NoSQL, in-memory) must be justified and documented.
-- **Token Format:** The token format (e.g., JWT, opaque) must be explicitly defined and documented before implementation.
-- **API Design:** All endpoints must follow RESTful conventions and use HTTPS.
-- **Extensibility:** The architecture must allow for future enhancements (e.g., multi-factor authentication, OAuth integration) without major refactoring.
-- **Compliance:** The service must comply with relevant security and privacy standards (e.g., GDPR, SOC2) as required by the organization.
+### Technology Stack
+- Runtime: Node.js 18+ or Java 17+ (Spring Boot 3.x)
+- Database: PostgreSQL 14+ with encryption at rest
+- Cache: Redis 7+ for session data and rate limiting
+- Authentication: JWT for stateless sessions, OAuth 2.0 for federated auth
 
----
+### Data Protection
+- No plaintext passwords SHALL be stored or logged
+- User PII MUST be encrypted at rest and in transit
+- Audit logs MUST be maintained for all authentication events
+- Rate limiting MUST be enforced to prevent brute force attacks
 
-## Decision-Making Guardrails
-
-- **No hardcoded secrets:** All secrets (e.g., signing keys, DB credentials) must be managed via secure configuration or secret management systems.
-- **No direct credential storage:** Passwords must never be stored in plaintext; always use strong, salted hashing algorithms.
-- **No token leakage:** Tokens must not be logged or exposed in error messages or logs.
-
----
-
-## Review and Amendments
-
-- This constitution is a living document and must be reviewed at each major release or architectural change.
-- Amendments require approval from the platform security lead and service owner.
-
----
-
-**Pushed to GitHub:**  
-Repository: https://github.com/XEBIA-ACE/test_madhuri  
-Branch: test_madhuri  
-Commit: Add Authentication Service constitution.md and related SpecKit files
+### Integration Standards
+- All external integrations MUST use secure protocols (HTTPS, TLS)
+- API contracts MUST be defined using OpenAPI 3.0 specification
+- Error responses MUST NOT leak sensitive information
+- Health checks MUST be provided for monitoring and orchestration
