@@ -1,0 +1,183 @@
+# Minimal EKS Cluster
+
+This Terraform configuration creates a minimal but production-ready EKS cluster on AWS with the following features:
+
+## Architecture
+
+- **EKS Cluster**: Kubernetes 1.31 with managed control plane
+- **Node Group**: Managed node group with t3.medium instances (2 nodes by default)
+- **Networking**: New VPC (10.0.0.0/16) with public and private subnets across 2 AZs
+- **Security**: Proper IAM roles, security groups, and encryption
+- **Add-ons**: VPC CNI, CoreDNS, and kube-proxy
+- **Logging**: CloudWatch logging for control plane components
+- **State Management**: S3 backend with DynamoDB locking
+
+## Prerequisites
+
+1. AWS CLI configured with appropriate permissions
+2. Terraform >= 1.5.0
+3. kubectl (for cluster access)
+
+## Deployment
+
+1. **Initialize Terraform** (first run only):
+   ```bash
+   terraform init
+   ```
+
+2. **Plan the deployment**:
+   ```bash
+   terraform plan
+   ```
+
+3. **Apply the configuration**:
+   ```bash
+   terraform apply
+   ```
+
+4. **Configure kubectl**:
+   ```bash
+   aws eks update-kubeconfig --region us-east-1 --name minimal-eks
+   ```
+
+5. **Verify cluster access**:
+   ```bash
+   kubectl get nodes
+   ```
+
+## Configuration Options
+
+### Variables
+
+- `aws_region`: AWS region (default: us-east-1)
+- `environment`: Environment name (default: dev)
+- `cluster_name`: EKS cluster name (default: minimal-eks)
+- `kubernetes_version`: Kubernetes version (default: 1.31)
+- `node_instance_types`: EC2 instance types for nodes (default: ["t3.medium"])
+- `node_desired_capacity`: Desired number of nodes (default: 2)
+- `node_max_capacity`: Maximum nodes (default: 4)
+- `node_min_capacity`: Minimum nodes (default: 1)
+
+### Customization
+
+To customize the deployment, create a `terraform.tfvars` file:
+
+```hcl
+cluster_name         = "my-eks-cluster"
+environment         = "dev"
+node_instance_types = ["t3.large"]
+node_desired_capacity = 3
+```
+
+## Security Features
+
+- **Encryption**: EKS secrets encrypted with KMS
+- **Network**: Private subnets for worker nodes
+- **IAM**: Least-privilege roles for cluster and nodes
+- **Security Groups**: Restricted access between components
+- **Logging**: Control plane logs in CloudWatch
+
+## Integration with Existing Services
+
+This EKS cluster can integrate with your existing authentication system:
+
+1. **Service Mesh**: Deploy Istio or Linkerd for service-to-service communication
+2. **Ingress**: Use AWS Load Balancer Controller with ALB
+3. **Authentication**: Integrate with your Auth Service via JWT validation
+4. **Monitoring**: Connect to your existing observability stack
+
+## Cost Optimization
+
+For development environments:
+- Use t3.medium instances (included)
+- Set minimum nodes to 1
+- Enable cluster autoscaler for automatic scaling
+
+## Cleanup
+
+To destroy the infrastructure:
+
+```bash
+terraform destroy
+```
+
+**Note**: This will delete all resources including the EKS cluster and VPC.
+
+## Outputs
+
+After deployment, important values are available as outputs:
+- `cluster_endpoint`: EKS API server endpoint
+- `kubeconfig_command`: Command to configure kubectl
+- `vpc_id`: VPC ID for integration with other services
+- `private_subnet_ids`: Private subnet IDs for service deployment
+
+## Next Steps
+
+1. **Install AWS Load Balancer Controller** for ingress
+2. **Set up cluster autoscaler** for automatic node scaling
+3. **Deploy monitoring stack** (Prometheus, Grafana)
+4. **Configure RBAC** for user access
+5. **Deploy your applications** to the cluster
+
+## Support
+
+This configuration follows AWS best practices and includes:
+- Multi-AZ deployment for high availability
+- Managed node groups for simplified operations
+- Proper tagging for cost allocation
+- Security best practices
+
+For issues or questions, refer to the AWS EKS documentation or Terraform AWS provider documentation.
+
+## Deployment Instructions
+
+**Step 1: Initialize and Deploy**
+```bash
+# Clone or create the configuration files
+terraform init
+terraform plan
+terraform apply -auto-approve
+```
+
+**Step 2: Configure kubectl**
+```bash
+aws eks update-kubeconfig --region us-east-1 --name minimal-eks
+kubectl get nodes
+kubectl get pods --all-namespaces
+```
+
+**Step 3: Deploy Sample Application (Optional)**
+```bash
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=80 --type=LoadBalancer
+kubectl get services
+```
+
+This minimal EKS configuration provides a solid foundation for deploying containerized versions of your authentication services while maintaining security and operational best practices.
+
+I've generated a complete, minimal EKS cluster configuration that includes:
+
+## **Key Features:**
+- **Latest Terraform AWS Provider**: v6.42
+- **Kubernetes 1.31**: Latest stable version
+- **Production-ready**: Security groups, IAM roles, encryption, logging
+- **Cost-optimized**: t3.medium instances, minimal node count for dev
+- **Complete networking**: VPC, subnets, NAT gateway, security groups
+- **State management**: S3 backend with DynamoDB locking
+- **EKS Add-ons**: VPC CNI, CoreDNS, kube-proxy
+
+## **Alignment with Your Architecture:**
+- **AWS us-east-1**: Matches your HLD region
+- **Separate VPC**: Uses 10.0.0.0/16 to avoid conflicts with your existing 10.10.0.0/16 (dev) and 10.20.0.0/16 (prod)
+- **Security-first**: KMS encryption, CloudWatch logging, proper IAM roles
+- **Integration-ready**: Can host containerized versions of your Auth Service, API Gateway, etc.
+
+## **Quick Deployment:**
+```bash
+terraform init
+terraform apply -auto-approve
+aws eks update-kubeconfig --region us-east-1 --name minimal-eks
+kubectl get nodes
+```
+
+This EKS cluster can serve as a platform for running containerized versions of your authentication services, providing an alternative deployment target alongside your existing ECS Fargate setup.

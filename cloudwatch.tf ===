@@ -1,0 +1,12 @@
+# CloudWatch Log Group for EKS cluster logs
+resource "aws_cloudwatch_log_group" "eks" {
+  count = var.enable_logging ? 1 : 0
+
+  name              = "/aws/eks/${var.cluster_name}/cluster"
+  retention_in_days = 7
+  kms_key_id        = var.enable_cluster_encryption ? aws_kms_key.eks[0].arn : null
+
+  tags = {
+    Name = "${var.cluster_name}-logs"
+  }
+}

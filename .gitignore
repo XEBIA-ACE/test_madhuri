@@ -1,15 +1,3 @@
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-.terraform.lock.hcl
-crash.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-
 # IDE
 .idea/
 .vscode/
@@ -20,3 +8,10 @@ override.tf.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# Dependencies
+node_modules/
+vendor/
