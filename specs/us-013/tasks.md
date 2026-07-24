@@ -1,0 +1,7 @@
+- [ ] update src/AuthenticationService/Program.cs: register identity provider settings and add SSO dependencies
+- [ ] modify src/AuthenticationService/Controllers/AuthenticationController.cs: add endpoint for initiating SSO
+- [ ] adjust frontend application (not specified in the code context) to add "Sign in with SSO" button on login page
+- [ ] edit environment configuration to include identity provider settings and redirect URIs
+- [ ] conduct security testing for SSO feature, focusing on vulnerabilities like XSS and CSRF
+- [ ] perform integration tests to ensure SSO works with environment-configured identity provider
+- [ ] verify that only pre-registered redirect URIs are used during authentication attempts
