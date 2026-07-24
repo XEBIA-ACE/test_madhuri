@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HRIS Login</title>
+    <style>
+        /* -------------------------------------------------------
+           Base reset & typography
+        ------------------------------------------------------- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                         Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #1a1a2e;
+        }
+
+        /* -------------------------------------------------------
+           Card container
+        ------------------------------------------------------- */
+        .login-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10);
+            padding: 48px 40px 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card__logo {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .login-card__logo svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .login-card__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px;
+            color: #1a1a2e;
+        }
+
+        .login-card__subtitle {
+            font-size: 0.875rem;
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 32px;
+        }
+
+        /* -------------------------------------------------------
+           Form elements
+        ------------------------------------------------------- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            color: #1a1a2e;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* -------------------------------------------------------
+           Primary button (standard login)
+        ------------------------------------------------------- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+            text-decoration: none;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn--primary {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+
+        .btn--primary:hover:not(:disabled) {
+            background-color: #4338ca;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+        }
+
+        .btn--primary:active:not(:disabled) {
+            background-color: #3730a3;
+        }
+
+        /* -------------------------------------------------------
+           SSO button — styled consistently, visually distinct
+        ------------------------------------------------------- */
+        .btn--sso {
+            background-color: #ffffff;
+            color: #374151;
+            border: 1.5px solid #d1d5db;
+            margin-top: 12px;
+        }
+
+        .btn--sso:hover:not(:disabled) {
+            background-color: #f9fafb;
+            border-color: #9ca3af;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn--sso:active:not(:disabled) {
+            background-color: #f3f4f6;
+        }
+
+        /* SSO icon (key symbol) */
+        .btn--sso .sso-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* -------------------------------------------------------
+           Divider
+        ------------------------------------------------------- */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 24px 0;
+            color: #9ca3af;
+            font-size: 0.8125rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #e5e7eb;
+        }
+
+        /* -------------------------------------------------------
+           Error / status messages
+        ------------------------------------------------------- */
+        .alert {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert--error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .alert--info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        /* -------------------------------------------------------
+           Loading spinner (shown while SSO redirect is pending)
+        ------------------------------------------------------- */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <main class="login-card" role="main">
+
+        <!-- Logo / branding -->
+        <div class="login-card__logo" aria-hidden="true">
+            <!-- Simple building icon representing HRIS -->
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="48" height="48" rx="10" fill="#4f46e5"/>
+                <path d="M10 38V16l14-8 14 8v22H10z" fill="#ffffff" fill-opacity="0.15"/>
+                <rect x="14" y="20" width="6" height="6" rx="1" fill="#ffffff"/>
+                <rect x="28" y="20" width="6" height="6" rx="1" fill="#ffffff"/>
+                <rect x="14" y="30" width="6" height="6" rx="1" fill="#ffffff"/>
+                <rect x="28" y="30" width="6" height="6" rx="1" fill="#ffffff"/>
+                <rect x="20" y="32" width="8" height="6" rx="1" fill="#ffffff"/>
+            </svg>
+        </div>
+
+        <h1 class="login-card__title">HRIS Portal</h1>
+        <p class="login-card__subtitle">Sign in to access your account</p>
+
+        <!-- Error / info banner -->
+        <div id="alertBanner" class="alert" role="alert" aria-live="polite"></div>
+
+        <!-- Standard username / password form -->
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    autocomplete="username"
+                    placeholder="Enter your username"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                    required
+                />
+            </div>
+
+            <button type="submit" class="btn btn--primary" id="loginBtn">
+                Sign in
+            </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="divider" aria-hidden="true">or</div>
+
+        <!--
+            SSO Button
+            ──────────
+            Clicking this button calls POST /api/auth/sso/initiate on the
+            backend, which returns a redirect URL to the configured identity
+            provider. The browser is then redirected to that URL to complete
+            the SSO flow.
+
+            Styled consistently with the rest of the UI (same border-radius,
+            font-size, padding) but visually differentiated as a secondary
+            action via the btn--sso modifier class.
+        -->
+        <button
+            type="button"
+            class="btn btn--sso"
+            id="ssoBtn"
+            aria-label="Sign in with Single Sign-On"
+        >
+            <!-- Key / SSO icon -->
+            <svg class="sso-icon" viewBox="0 0 20 20" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M8 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
+                      fill="#4f46e5"/>
+                <path d="M9.293 10.293a1 1 0 0 1 1.414 0L12 11.586l1.293-1.293a1 1 0 1 1
+                         1.414 1.414L13.414 13l1.293 1.293a1 1 0 0 1-1.414 1.414L12
+                         14.414l-1.293 1.293a1 1 0 0 1-1.414-1.414L10.586 13l-1.293-1.293a1
+                         1 0 0 1 0-1.414z"
+                      fill="#4f46e5"/>
+            </svg>
+            Sign in with SSO
+        </button>
+
+    </main>
+
+    <script>
+        // -------------------------------------------------------
+        // Utility helpers
+        // -------------------------------------------------------
+
+        /**
+         * Show an alert banner with the given message and style variant.
+         * @param {string} message
+         * @param {'error'|'info'} type
+         */
+        function showAlert(message, type = 'error') {
+            const banner = document.getElementById('alertBanner');
+            banner.textContent = message;
+            banner.className = `alert alert--${type}`;
+            banner.style.display = 'block';
+        }
+
+        function hideAlert() {
+            const banner = document.getElementById('alertBanner');
+            banner.style.display = 'none';
+        }
+
+        /**
+         * Set a button into a loading state (shows spinner, disables it).
+         * @param {HTMLButtonElement} btn
+         * @param {string} loadingText
+         */
+        function setButtonLoading(btn, loadingText) {
+            btn.disabled = true;
+            btn.dataset.originalHtml = btn.innerHTML;
+            btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> ${loadingText}`;
+        }
+
+        /**
+         * Restore a button from its loading state.
+         * @param {HTMLButtonElement} btn
+         */
+        function restoreButton(btn) {
+            btn.disabled = false;
+            if (btn.dataset.originalHtml) {
+                btn.innerHTML = btn.dataset.originalHtml;
+                delete btn.dataset.originalHtml;
+            }
+        }
+
+        // -------------------------------------------------------
+        // Standard login form submission
+        // -------------------------------------------------------
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideAlert();
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showAlert('Please enter both username and password.');
+                return;
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            setButtonLoading(loginBtn, 'Signing in…');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Store token and redirect to the application dashboard.
+                    // TODO: Replace '/dashboard' with the actual post-login route.
+                    sessionStorage.setItem('auth_token', data.token);
+                    window.location.href = '/dashboard';
+                } else {
+                    const err = await response.json().catch(() => ({}));
+                    showAlert(err.message || 'Invalid username or password. Please try again.');
+                }
+            } catch {
+                showAlert('Unable to reach the server. Please check your connection and try again.');
+            } finally {
+                restoreButton(loginBtn);
+            }
+        });
+
+        // -------------------------------------------------------
+        // SSO button — initiates the SSO authentication flow
+        // -------------------------------------------------------
+        document.getElementById('ssoBtn').addEventListener('click', async function () {
+            hideAlert();
+
+            const ssoBtn = document.getElementById('ssoBtn');
+            setButtonLoading(ssoBtn, 'Redirecting to SSO…');
+
+            try {
+                /*
+                 * Call the backend SSO initiation endpoint.
+                 * The endpoint returns a JSON object with a `redirectUrl` property
+                 * pointing to the configured identity provider's authorization URL.
+                 *
+                 * Example response:
+                 *   { "redirectUrl": "https://idp.example.com/authorize?client_id=...&..." }
+                 *
+                 * Only pre-registered redirect URIs are accepted by the backend,
+                 * mitigating Open Redirect vulnerabilities.
+                 */
+                const response = await fetch('/api/auth/sso/initiate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    if (data && data.redirectUrl) {
+                        showAlert('Redirecting to your identity provider…', 'info');
+                        // Redirect the browser to the identity provider's authorization URL.
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        showAlert('SSO configuration error: no redirect URL received.');
+                        restoreButton(ssoBtn);
+                    }
+                } else {
+                    const err = await response.json().catch(() => ({}));
+                    showAlert(err.message || 'SSO initiation failed. Please contact your administrator.');
+                    restoreButton(ssoBtn);
+                }
+            } catch {
+                showAlert('Unable to reach the server. Please check your connection and try again.');
+                restoreButton(ssoBtn);
+            }
+        });
+    </script>
+</body>
+</html>
