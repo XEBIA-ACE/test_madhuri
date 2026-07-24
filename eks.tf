@@ -1,87 +1,83 @@
-# EKS Cluster
-resource "aws_eks_cluster" "main" {
-  name     = var.cluster_name
-  role_arn = aws_iam_role.eks_cluster.arn
-  version  = var.kubernetes_version
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 20.0"
 
-  vpc_config {
-    subnet_ids              = aws_subnet.public[*].id
-    endpoint_private_access = false
-    endpoint_public_access  = true
-    public_access_cidrs     = ["0.0.0.0/0"]
-    security_group_ids      = [aws_security_group.eks_cluster.id]
+  cluster_name    = var.cluster_name
+  cluster_version = var.eks_version
+
+  vpc_id     = aws_vpc.this.id
+  subnet_ids = aws_subnet.private[*].id
+
+  cluster_endpoint_public_access  = true
+  cluster_endpoint_private_access = true
+
+  enable_irsa = true
+
+  cluster_enabled_log_types = var.enable_cluster_logs ? [
+    "api",
+    "audit",
+    "authenticator",
+    "controllerManager",
+    "scheduler"
+  ] : []
+
+  cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
   }
 
-  # Enable EKS Cluster Control Plane Logging
-  enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  eks_managed_node_groups = {
+    default = {
+      desired_size = var.desired_capacity
+      min_size     = var.min_size
+      max_size     = var.max_size
 
-  # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_cluster_policy,
-  ]
+      instance_types = var.node_instance_types
+      capacity_type  = "ON_DEMAND"
+      subnet_ids     = aws_subnet.private[*].id
+      disk_size      = 20
 
-  tags = {
-    Name = var.cluster_name
-  }
-}
+      iam_role_additional_policies = {
+        cloudwatch_agent = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+      }
 
-# EKS Node Group
-resource "aws_eks_node_group" "main" {
-  cluster_name    = aws_eks_cluster.main.name
-  node_group_name = "${var.cluster_name}-nodes"
-  node_role_arn   = aws_iam_role.eks_node_group.arn
-  subnet_ids      = aws_subnet.public[*].id
-  instance_types  = var.node_instance_types
-
-  scaling_config {
-    desired_size = var.node_desired_capacity
-    max_size     = var.node_max_capacity
-    min_size     = var.node_min_capacity
+      tags = {
+        Name        = "${var.cluster_name}-default-ng"
+        ManagedBy   = "ace"
+        Environment = var.environment
+        Project     = var.project_id
+      }
+    }
   }
 
-  update_config {
-    max_unavailable = 1
-  }
-
-  # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_worker_node_policy,
-    aws_iam_role_policy_attachment.eks_cni_policy,
-    aws_iam_role_policy_attachment.eks_container_registry_policy,
-  ]
-
-  tags = {
-    Name = "${var.cluster_name}-nodes"
-  }
+  tags = merge(
+    {
+      ManagedBy   = "ace"
+      Environment = var.environment
+      Project     = var.project_id
+    },
+    var.tags,
+  )
 }
 
-# EKS Add-ons
-resource "aws_eks_addon" "vpc_cni" {
-  cluster_name = aws_eks_cluster.main.name
-  addon_name   = "vpc-cni"
-  addon_version = "v1.18.1-eksbuild.3"
-  resolve_conflicts_on_create = "OVERWRITE"
-}
+resource "aws_cloudwatch_log_group" "eks" {
+  name              = "/aws/eks/${var.cluster_name}/cluster"
+  retention_in_days = 30
 
-resource "aws_eks_addon" "coredns" {
-  cluster_name = aws_eks_cluster.main.name
-  addon_name   = "coredns"
-  addon_version = "v1.11.1-eksbuild.8"
-  resolve_conflicts_on_create = "OVERWRITE"
-
-  depends_on = [aws_eks_node_group.main]
-}
-
-resource "aws_eks_addon" "kube_proxy" {
-  cluster_name = aws_eks_cluster.main.name
-  addon_name   = "kube-proxy"
-  addon_version = "v1.31.0-eksbuild.5"
-  resolve_conflicts_on_create = "OVERWRITE"
-}
-
-resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name = aws_eks_cluster.main.name
-  addon_name   = "aws-ebs-csi-driver"
-  addon_version = "v1.35.0-eksbuild.1"
-  resolve_conflicts_on_create = "OVERWRITE"
+  tags = merge(
+    {
+      Name        = "${var.cluster_name}-logs"
+      ManagedBy   = "ace"
+      Environment = var.environment
+      Project     = var.project_id
+    },
+    var.tags,
+  )
 }

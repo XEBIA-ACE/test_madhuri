@@ -1,51 +1,37 @@
-# EKS Cluster Service Role
-resource "aws_iam_role" "eks_cluster" {
-  name = "${var.cluster_name}-cluster-role"
+data "aws_iam_policy_document" "cluster_autoscaler" {
+  statement {
+    sid    = "ClusterAutoscalerAll"
+    effect = "Allow"
 
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "eks.amazonaws.com"
-      }
-    }]
-    Version = "2012-10-17"
-  })
+    actions = [
+      "autoscaling:DescribeAutoScalingGroups",
+      "autoscaling:DescribeAutoScalingInstances",
+      "autoscaling:DescribeLaunchConfigurations",
+      "autoscaling:DescribeTags",
+      "autoscaling:SetDesiredCapacity",
+      "autoscaling:TerminateInstanceInAutoScalingGroup",
+      "ec2:DescribeLaunchTemplateVersions"
+    ]
+
+    resources = ["*"]
+  }
 }
 
-resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
-  role       = aws_iam_role.eks_cluster.name
+resource "aws_iam_policy" "cluster_autoscaler" {
+  name        = "${var.cluster_name}-cluster-autoscaler"
+  description = "EKS cluster-autoscaler policy"
+  policy      = data.aws_iam_policy_document.cluster_autoscaler.json
+
+  tags = merge(
+    {
+      ManagedBy   = "ace"
+      Environment = var.environment
+      Project     = var.project_id
+    },
+    var.tags,
+  )
 }
 
-# EKS Node Group Service Role
-resource "aws_iam_role" "eks_node_group" {
-  name = "${var.cluster_name}-node-group-role"
-
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
-      }
-    }]
-    Version = "2012-10-17"
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-  role       = aws_iam_role.eks_node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-  role       = aws_iam_role.eks_node_group.name
-}
-
-resource "aws_iam_role_policy_attachment" "eks_container_registry_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.eks_node_group.name
+resource "aws_iam_service_linked_role" "eks" {
+  aws_service_name = "eks.amazonaws.com"
 }

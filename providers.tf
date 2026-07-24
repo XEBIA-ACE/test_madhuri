@@ -1,27 +1,52 @@
 terraform {
   required_version = ">= 1.5.0"
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.41"
+      version = "~> 5.0"
+    }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.29"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.13"
     }
   }
+
   backend "s3" {
-    bucket         = "eks-tfstate-bucket-dev"
+    bucket         = "tfstate-${var.project_id}-${var.environment}"
     key            = "eks/terraform.tfstate"
-    region         = "us-east-1"
-    dynamodb_table = "eks-tfstate-lock"
+    region         = var.region
+    dynamodb_table = "tf-lock-${var.project_id}-${var.environment}"
+    encrypt        = true
   }
 }
 
 provider "aws" {
   region = var.region
-  default_tags {
-    tags = {
-      Environment = var.environment
-      Project     = var.project_name
-      ManagedBy   = "Terraform"
-      Owner       = "DevOps"
-    }
+}
+
+data "aws_eks_cluster" "this" {
+  name = module.eks.cluster_name
+}
+
+data "aws_eks_cluster_auth" "this" {
+  name = module.eks.cluster_name
+}
+
+provider "kubernetes" {
+  host                   = data.aws_eks_cluster.this.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.this.token
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = data.aws_eks_cluster.this.endpoint
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
+    token                  = data.aws_eks_cluster_auth.this.token
   }
 }
